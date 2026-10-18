@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HomeGuardian 家長控制台</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        h2 { text-align: center; color: #333; margin-bottom: 5px;}
+        .status-box { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center; font-size: 18px; }
+        .status-box span { font-weight: bold; color: #1976d2; }
+        
+        ul { list-style: none; padding: 0; }
+        li { display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid #ddd; padding: 12px; margin: 8px 0; border-radius: 8px; }
+        
+        .app-info { display: flex; align-items: center; gap: 15px; }
+        .app-icon { width: 45px; height: 45px; border-radius: 10px; background: #eee; object-fit: cover; }
+        .app-details { display: flex; flex-direction: column; }
+        .app-name { font-weight: bold; font-size: 16px; color: #333; }
+        .app-time { font-size: 12px; color: #666; margin-top: 4px;}
+        
+        button { padding: 8px 16px; border: none; cursor: pointer; border-radius: 6px; font-weight: bold; color: white; transition: 0.2s;}
+        .btn-lock { background: #dc3545; }
+        .btn-lock:hover { background: #a71d2a; }
+        .btn-unlock { background: #28a745; }
+        .btn-unlock:hover { background: #1e7e34; }
+        
+        .btn-all { width: 100%; margin-top: 20px; background: #555; padding: 12px; font-size: 16px;}
+        .btn-all:hover { background: #333; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>👨‍👩‍👧 小孩手機守護者</h2>
+        
+        <div class="status-box">
+            小孩目前正在使用：<span id="currentApp">載入中...</span>
+        </div>
+
+        <h3>📱 已安裝的 App 列表：</h3>
+        <ul id="appList">
+            <li style="justify-content:center; color:#888;">等待小孩手機上傳資料...</li>
+        </ul>
+
+        <button class="btn-all" onclick="unlockAll()">🔓 解除所有鎖定</button>
+    </div>
+
+    <script>
+        function fetchData() {
+            // 1. 抓取小孩最新狀態
+            fetch('/get_kid_status')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('currentApp').innerText = data.currentActiveApp || "未知";
+                });
+
+            // 2. 抓取所有 App 列表與鎖定狀態
+            fetch('/get_all_apps')
+                .then(res => res.json())
+                .then(apps => {
+                    const list = document.getElementById('appList');
+                    
+                    if (!apps || apps.length === 0) {
+                        return; // 如果還沒資料，先不更新
+                    }
+
+                    list.innerHTML = '';
+                    // 依照使用時間排序
+                    apps.sort((a, b) => b.totalSeconds - a.totalSeconds);
+
+                    apps.forEach(app => {
+                        const li = document.createElement('li');
+                        
+                        const mins = Math.floor(app.totalSeconds / 60);
+                        const secs = app.totalSeconds % 60;
+                        const timeStr = `${mins}分 ${secs}秒`;
+
+                        // 判斷按鈕樣式
+                        const btnClass = app.isLocked ? 'btn-unlock' : 'btn-lock';
+                        const btnText = app.isLocked ? '🔓 已鎖定' : '🔒 鎖定';
+                        const action = app.isLocked ? `unlockApp('${app.packageName}')` : `lockApp('${app.packageName}')`;
+
+                        li.innerHTML = `
+                            <div class="app-info">
+                                <img src="/get_icon/${app.packageName}" class="app-icon" onerror="this.src='https://via.placeholder.com/45x45?text=?'" />
+                                <div class="app-details">
+                                    <span class="app-name">${app.appName}</span>
+                                    <span class="app-time">今日使用: ${timeStr}</span>
+                                </div>
+                            </div>
+                            <button class="${btnClass}" onclick="${action}">${btnText}</button>
+                        `;
+                        list.appendChild(li);
+                    });
+                });
+        }
+        
+        // 每 2 秒自動刷新一次
+        setInterval(fetchData, 2000);
+
+        function lockApp(pkg) {
+            fetch(`/lock?package=${pkg}`).then(fetchData);
+        }
+
+        function unlockApp(pkg) {
+            fetch(`/unlock?package=${pkg}`).then(fetchData);
+        }
+
+        function unlockAll() {
+            fetch('/unlock_all').then(fetchData);
+        }
+
+        // 網頁載入時立刻執行
+        fetchData();
+    </script>
+</body>
+</html>

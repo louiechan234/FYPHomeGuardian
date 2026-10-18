@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HomeGuardian 家長控制台</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        h2 { text-align: center; color: #333; }
+        .status-box { background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 18px; }
+        .status-box span { font-weight: bold; color: #1976d2; }
+        input, button { width: 100%; padding: 10px; margin: 5px 0; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold;}
+        button:hover { background: #0056b3; }
+        button.unlock { background: #dc3545; width: auto; padding: 5px 15px;}
+        button.unlock:hover { background: #a71d2a; }
+        ul { list-style: none; padding: 0; }
+        li { display: flex; justify-content: space-between; align-items: center; background: #eee; padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .app-info { display: flex; align-items: center; gap: 10px; }
+        .app-icon { width: 40px; height: 40px; border-radius: 8px; background: #ccc; object-fit: cover; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>👨‍👩‍👧 多 App 鎖定控制台</h2>
+        
+        <!-- ✅ 顯示小孩當前狀態 -->
+        <div class="status-box">
+            小孩目前正在使用：<span id="currentApp">載入中...</span>
+        </div>
+
+        <p>輸入要鎖定的 App 包名（例如：com.android.chrome）</p>
+        <input type="text" id="packageInput" placeholder="請輸入包名">
+        <button onclick="lockApp()">🔒 新增至黑名單</button>
+        <button class="unlock" style="width: 100%; margin-top: 10px; background: #555;" onclick="unlockAll()">🔓 解除所有鎖定</button>
+
+        <h3>目前鎖定的 App：</h3>
+        <ul id="lockedList"></ul>
+    </div>
+
+    <script>
+        function fetchStatus() {
+            // 1. 抓取小孩最新狀態
+            fetch('/get_kid_status')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('currentApp').innerText = data.currentActiveApp;
+                })
+                .catch(err => console.log(err));
+
+            // 2. 抓取黑名單列表
+            fetch('/get_lock_status')
+                .then(res => res.json())
+                .then(data => {
+                    const list = document.getElementById('lockedList');
+                    list.innerHTML = '';
+                    if (data.lockedApps.length === 0) {
+                        list.innerHTML = '<li>目前沒有鎖定任何 App</li>';
+                    } else {
+                        data.lockedApps.forEach(pkg => {
+                            const li = document.createElement('li');
+                            
+                            // ✅ 這裡加上 <img> 標籤來顯示圖示
+                            li.innerHTML = `
+                                <div class="app-info">
+                                    <img src="/get_icon/${pkg}" class="app-icon" onerror="this.src='https://via.placeholder.com/40x40?text=?'" />
+                                    <span>${pkg}</span>
+                                </div> 
+                                <button class="unlock" onclick="unlockApp('${pkg}')">解鎖</button>
+                            `;
+                            list.appendChild(li);
+                        });
+                    }
+                })
+                .catch(err => console.log(err));
+        }
+        
+        // 每 2 秒自動刷新一次
+        setInterval(fetchStatus, 2000);
+
+        function lockApp() {
+            const pkg = document.getElementById('packageInput').value;
+            if(!pkg) return alert('請輸入包名！');
+            fetch(`/lock?package=${pkg}`).then(() => {
+                document.getElementById('packageInput').value = '';
+                fetchStatus();
+            });
+        }
+
+        function unlockApp(pkg) {
+            fetch(`/unlock?package=${pkg}`).then(fetchStatus);
+        }
+
+        function unlockAll() {
+            fetch('/unlock_all').then(fetchStatus);
+        }
+
+        // 網頁載入時立刻執行一次
+        fetchStatus();
+    </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+[
+  {
+    "packageName": "com.google.android.apps.nexuslauncher",
+    "appName": "com.google.android.apps.nexuslauncher",
+    "minutes": 1303
+  },
+  {
+    "packageName": "hk.homeguardian",
+    "appName": "HomeGuardian",
+    "minutes": 127
+  },
+  {
+    "packageName": "com.android.chrome",
+    "appName": "Chrome",
+    "minutes": 6
+  },
+  {
+    "packageName": "com.android.settings",
+    "appName": "Settings",
+    "minutes": 5
+  },
+  {
+    "packageName": "com.google.android.apps.photos",
+    "appName": "Photos",
+    "minutes": 2
+  },
+  {
+    "packageName": "com.google.android.youtube",
+    "appName": "YouTube",
+    "minutes": 0
+  },
+  {
+    "packageName": "com.android.vending",
+    "appName": "Google Play Store",
+    "minutes": 0
+  },
+  {
+    "packageName": "com.google.android.permissioncontroller",
+    "appName": "Permission controller",
+    "minutes": 0
+  },
+  {
+    "packageName": "com.google.android.apps.wellbeing",
+    "appName": "Digital Wellbeing",
+    "minutes": 0
+  },
+  {
+    "packageName": "com.google.android.packageinstaller",
+    "appName": "Package installer",
+    "minutes": 0
+  },
+  {
+    "packageName": "com.google.android.googlesdksetup",
+    "appName": "com.google.android.googlesdksetup",
+    "minutes": 0
+  }
+]

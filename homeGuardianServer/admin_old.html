@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HomeGuardian 家長控制台</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        h2 { text-align: center; color: #333; }
+        input, button { width: 100%; padding: 10px; margin: 5px 0; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px;}
+        button:hover { background: #0056b3; }
+        button.unlock { background: #dc3545; width: auto; padding: 5px 10px;}
+        button.unlock:hover { background: #a71d2a; }
+        ul { list-style: none; padding: 0; }
+        li { display: flex; justify-content: space-between; align-items: center; background: #eee; padding: 10px; margin: 5px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>👨‍👩‍👧 多 App 鎖定控制台</h2>
+        
+        <p>輸入要鎖定的 App 包名（例如：com.android.chrome）</p>
+        <input type="text" id="packageInput" placeholder="請輸入包名">
+        <button onclick="lockApp()">🔒 新增至黑名單</button>
+        <button class="unlock" style="width: 100%; margin-top: 10px; background: #555;" onclick="unlockAll()">🔓 解除所有鎖定</button>
+
+        <h3>目前鎖定的 App：</h3>
+        <ul id="lockedList"></ul>
+    </div>
+
+    <script>
+        function fetchStatus() {
+            fetch('/get_lock_status')
+                .then(res => res.json())
+                .then(data => {
+                    const list = document.getElementById('lockedList');
+                    list.innerHTML = '';
+                    if (data.lockedApps.length === 0) {
+                        list.innerHTML = '<li>目前沒有鎖定任何 App</li>';
+                    } else {
+                        data.lockedApps.forEach(pkg => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `<span>${pkg}</span> <button class="unlock" onclick="unlockApp('${pkg}')">解鎖</button>`;
+                            list.appendChild(li);
+                        });
+                    }
+                });
+        }
+        setInterval(fetchStatus, 2000);
+
+        function lockApp() {
+            const pkg = document.getElementById('packageInput').value;
+            if(!pkg) return alert('請輸入包名！');
+            fetch(`/lock?package=${pkg}`).then(() => {
+                document.getElementById('packageInput').value = '';
+                fetchStatus();
+            });
+        }
+
+        function unlockApp(pkg) {
+            fetch(`/unlock?package=${pkg}`).then(fetchStatus);
+        }
+
+        function unlockAll() {
+            fetch('/unlock_all').then(fetchStatus);
+        }
+
+        fetchStatus();
+    </script>
+</body>
+</html>
