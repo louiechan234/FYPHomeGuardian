@@ -102,8 +102,8 @@ class MainActivity : ComponentActivity() {
                 while (true) {
                     try {
                         val response = withContext(Dispatchers.IO) {
-                            // 如果你是模擬器用 10.0.2.2，真機請改 192.168.1.137
-                            val url = URL("http://10.0.2.2:3000/get_update")//192.168.1.137"http://10.0.2.2:3000/get_update" this is virual phone ip
+                            // 如果你是模擬器用 10.0.2.2，真機請改 192.168.x.xxx
+                            val url = URL("http://10.0.2.2:3000/get_update")//"http://10.0.2.2:3000/get_update" this is virual phone ip
                             val conn = url.openConnection() as HttpURLConnection
                             conn.requestMethod = "GET"
                             conn.connectTimeout = 3000

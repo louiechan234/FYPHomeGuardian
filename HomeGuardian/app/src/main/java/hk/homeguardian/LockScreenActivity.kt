@@ -36,7 +36,7 @@ class LockScreenActivity : ComponentActivity() {
                 while (true) {
                     try {
                         val response = withContext(Dispatchers.IO) {
-                            val url = URL("http://192.168.1.137:3000/get_lock_status")
+                            val url = URL("http://10.0.2.2:3000/get_lock_status")
                             val conn = url.openConnection() as HttpURLConnection
                             conn.connectTimeout = 2000
                             conn.readTimeout = 2000
