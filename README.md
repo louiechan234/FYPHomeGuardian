@@ -32,7 +32,7 @@
 
 ```text
 FYPHomeGuardian/
-├── homeGuardianServer/                 # Node.js 後端伺服器
+├── homeGuardianServer/     # Node.js 後端伺服器
 │   ├── server.js           # 主程式 (API 路由、資料處理)
 │   ├── admin.html          # 家長控制台網頁
 │   ├── usage_data.json     # (執行後產生) 儲存最新的使用時間資料
