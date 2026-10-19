@@ -47,3 +47,56 @@ HomeGuardian/
     │   ├── res/
     │   └── AndroidManifest.xml
     └── build.gradle.kts
+```
+
+## 🚀 安裝與運行指南
+
+1. 啟動 Node.js 伺服器
+請確保電腦已安裝 Node.js。
+```
+bash
+### 進入伺服器資料夾
+cd Server
+
+### 安裝依賴套件
+npm install express
+
+### 啟動伺服器
+node server.js
+```
+
+啟動成功後，開啟瀏覽器進入 http://localhost:3000/admin 即可看到家長控制台。
+
+### 2. 編譯並運行 Android App
+
+1.使用 Android Studio 開啟 Android 專案。
+2.**⚠️ 網路設定 (極度重要)**：
+3.打開 `UsageTrackerService.kt` 與 `MainActivity.kt`。
+
+若使用 **Android 模擬器**：請將 IP 保持為 `http://10.0.2.2:3000/`。
+
+若使用 **實體手機**：請將 IP 改為你電腦的區域網路 IP（例如：http://192.168.x.xxx:3000/），且手機與電腦需在同一個 Wi-Fi 下。
+
+3.執行 App。
+
+
+### 🔑 必要權限設定 (Permissions)
+為了讓系統正常運作，小孩端 App **必須**開啟以下權限，否則功能會失效：
+
+1.**使用量資料存取權** (Usage Access)：用於統計 App 使用時間。
+
+2.**通知權限** (Notifications)：用於顯示背景服務的常駐通知，防止被系統殺掉。
+
+3.**顯示在其他應用程式上層** (Display over other apps)：**（最重要）** 若無此權限，遠端鎖定的紅色警告畫面將無法彈出。(自已入setting改)
+
+## 📡 後端 API 端點 (API Endpoints)
+
+| Method | Endpoint | 說明 |
+| :--- | :--- | :--- |
+| **POST** | `/data` | 接收小孩端上傳的時間與 Base64 圖片資料 |
+| **GET** | `/admin` | 載入家長控制台網頁 |
+| **GET** | `/get_all_apps` | 獲取小孩手機所有 App 列表與鎖定狀態 |
+| **GET** | `/get_icon/:package` | 獲取特定 App 的圖片 (轉換為 JPEG) |
+| **GET** | `/lock?package=xxx` | 將特定 App 加入黑名單 |
+| **GET** | `/unlock?package=xxx` | 將特定 App 移出黑名單 |
+| **GET** | `/view_data` | 查看原始 JSON 資料庫 (供開發除錯用) |
