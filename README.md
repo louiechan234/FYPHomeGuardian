@@ -15,7 +15,7 @@
 - **螢幕時間統計**：透過 `UsageStatsManager` 精準取得各 App 的前台使用時間。
 - **背景長駐服務**：使用 `Foreground Service` 確保 App 在背景穩定運作，每 30 秒自動上傳數據。
 - **App 圖示同步**：自動將手機內 App 圖示轉換為 Base64 字串（JPG 格式）並上傳。
-- **遠端強制鎖定**：每 3 秒向伺服器拉取黑名單，若發現小孩正在使用被鎖定的 App，會立刻彈出**全螢幕紅色警告畫面**。
+- **遠端強制鎖定**：每 3 秒向伺服器拉取黑名單，若發現小孩正在使用被鎖定的 App，會立刻彈出**全螢幕紅色警告畫面**(仲有少少問題，如先打開要鎖定的App，再於後台鎖定，會無法即時鎖定，要切換一下畫面才能鎖定）。
 
 ### 💻 網頁控制台 (家長端)
 - **即時狀態監控**：即時顯示小孩目前正在使用的 App。
@@ -31,14 +31,14 @@
 ## 📂 專案目錄結構
 
 ```text
-HomeGuardian/
-├── Server/                 # Node.js 後端伺服器
+FYPHomeGuardian/
+├── homeGuardianServer/                 # Node.js 後端伺服器
 │   ├── server.js           # 主程式 (API 路由、資料處理)
 │   ├── admin.html          # 家長控制台網頁
 │   ├── usage_data.json     # (執行後產生) 儲存最新的使用時間資料
 │   └── package.json        # 依賴設定檔
 │
-└── AndroidApp/             # Android 小孩端專案 (Android Studio)
+└── HomeGuardian/             # Android 小孩端專案 (Android Studio)
     ├── app/src/main/
     │   ├── java/hk/homeguardian/
     │   │   ├── MainActivity.kt          # 前台 UI (顯示使用時間)
